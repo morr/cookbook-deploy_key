@@ -20,23 +20,24 @@ module DeployKey
     URI.parse case self
               when Chef::Provider::DeployKeyBitbucket then "https://bitbucket.org/api/1.0/repositories/#{new_resource.repo}/deploy-keys#{path}"
               when Chef::Provider::DeployKeyGithub    then "https://api.github.com/repos/#{new_resource.repo}/keys#{path}"
-              when Chef::Provider::DeployKeyGitlab    then "#{new_resource.api_url}/api/v3/projects/#{new_resource.repo_id}/keys#{path}"
+              when Chef::Provider::DeployKeyGitlab    then "#{new_resource.api_url}/api/v3/projects/#{new_resource.repo}/keys#{path}"
               end
+  end
+
+  def add_token(request)
+    case self
+    when Chef::Provider::DeployKeyGitlab
+      then request.add_field "PRIVATE-TOKEN", new_resource.credentials[:token]
+    else request.add_field "Authorization", "token #{new_resource.credentials[:token]}"
+    end
+    request
   end
 
   def auth(request)
     request.add_field "User-Agent", "Chef Deploy Key"
     request.add_field "Content-Type", "application/json"
     if new_resource.credentials[:token]
-      prefix = case self
-               when Chef::Provider::DeployKeyGitlab  then ""
-               else                                       "token "
-               end
-      header = case self
-               when Chef::Provider::DeployKeyGitlab  then "PRIVATE-TOKEN"
-               else                                       "Authorization"
-               end
-      request.add_field header, "#{prefix}#{new_resource.credentials[:token]}"
+      request = add_token(request)
     elsif new_resource.credentials[:user] && new_resource.credentials[:password]
       request.basic_auth(new_resource.credentials[:user], new_resource.credentials[:password])
     else
@@ -56,7 +57,7 @@ module DeployKey
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    response = http.request(req)
+    http.request(req)
   end
 
   def add_key(label, key)
