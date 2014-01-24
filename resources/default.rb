@@ -25,7 +25,11 @@ attribute :credentials, :kind_of => Hash, :required => true
 # should be in the format: username/repo_slug (e.g.: cassianoleal/cookbook-deploy_key)
 attribute :repo, :kind_of => String, :required => true, :regex => /\w+\/\w+/
 
+attribute :repo_id, :kind_of => Integer
+
 attribute :owner, :kind_of => String, :default => "root"
 attribute :group, :kind_of => String, :default => "root"
 
 attribute :mode, :default => 00600
+
+attribute :api_url, :kind_of => String, :default => nil

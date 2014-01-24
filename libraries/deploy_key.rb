@@ -20,6 +20,7 @@ module DeployKey
     URI.parse case self
               when Chef::Provider::DeployKeyBitbucket then "https://bitbucket.org/api/1.0/repositories/#{new_resource.repo}/deploy-keys#{path}"
               when Chef::Provider::DeployKeyGithub    then "https://api.github.com/repos/#{new_resource.repo}/keys#{path}"
+              when Chef::Provider::DeployKeyGitlab    then "#{new_resource.api_url}/api/v3/projects/#{new_resource.repo_id}/keys#{path}"
               end
   end
 
@@ -27,7 +28,15 @@ module DeployKey
     request.add_field "User-Agent", "Chef Deploy Key"
     request.add_field "Content-Type", "application/json"
     if new_resource.credentials[:token]
-      request.add_field "Authorization", "token #{new_resource.credentials[:token]}"
+      prefix = case self
+               when Chef::Provider::DeployKeyGitlab  then ""
+               else                                       "token "
+               end
+      header = case self
+               when Chef::Provider::DeployKeyGitlab  then "PRIVATE-TOKEN"
+               else                                       "Authorization"
+               end
+      request.add_field header, "#{prefix}#{new_resource.credentials[:token]}"
     elsif new_resource.credentials[:user] && new_resource.credentials[:password]
       request.basic_auth(new_resource.credentials[:user], new_resource.credentials[:password])
     else
@@ -55,6 +64,7 @@ module DeployKey
         case self
         when Chef::Provider::DeployKeyBitbucket then :label
         when Chef::Provider::DeployKeyGithub    then :title
+        when Chef::Provider::DeployKeyGitlab    then :title
         end => "#{label} - #{node.name}",
         :key => key
       }.to_json
@@ -71,6 +81,7 @@ module DeployKey
     key_id = case self
              when Chef::Provider::DeployKeyBitbucket then retrieved_key["pk"]
              when Chef::Provider::DeployKeyGithub    then retrieved_key["id"]
+             when Chef::Provider::DeployKeyGitlab    then retrieved_key["id"]
              end
     key_url = url("/#{key_id}")
     response = request(:delete, key_url)

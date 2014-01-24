@@ -21,6 +21,7 @@ Supported providers:
 
 * `Chef::Provider::DeployKeyGithub`
 * `Chef::Provider::DeployKeyBitbucket`
+* `Chef::Provider::DeployKeyGitlab`
 
 # Attributes
 
@@ -28,6 +29,8 @@ Supported providers:
 * `path`: The directory where the private and public keys are stored
 * `credentials`: The credentials used to authenticate on the API - see [below](#authentication)
 * `repo`: The repository where the deploy key will be installed. Has to be in the format `username/repo_slug` (e.g.: `cassianoleal/cookbook-deploy_key`)
+* `repo_id`: The repository id (for GitLab)
+* `api_url`: The url of the GitLab server
 * `owner`: The owner of the key files on disk. Defaults to `root`
 * `group`: The group of the key files on disk. Defaults to `root`
 * `mode`: The mode that will be passed on to chmod. Defaults to `0600`
