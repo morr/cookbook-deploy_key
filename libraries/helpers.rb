@@ -18,14 +18,14 @@ require 'net/https'
 module DeployKeyCookbook
   module Helpers
     def auth(request)
-      request.add_field "User-Agent", "Chef Deploy Key"
-      request.add_field "Content-Type", "application/json"
+      request.add_field 'User-Agent', 'Chef Deploy Key'
+      request.add_field 'Content-Type', 'application/json'
       if new_resource.credentials[:token]
         request = add_token(request)
       elsif new_resource.credentials[:user] && new_resource.credentials[:password]
         request.basic_auth(new_resource.credentials[:user], new_resource.credentials[:password])
       else
-        raise "No credentials. Need API token or username/password combination."
+        raise 'No credentials. Need API token or username/password combination.'
       end
       request
     end
@@ -39,7 +39,7 @@ module DeployKeyCookbook
       req = auth(req)
       req.body = body
       http = Net::HTTP.new(url.host, url.port)
-      if url.instance_of?  URI::HTTPS
+      if url.instance_of? URI::HTTPS
         http.use_ssl = true
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
@@ -76,7 +76,10 @@ module DeployKeyCookbook
         raise "Could not get list of keys from repository: #{response.code} #{response.body}"
       end
       keys = JSON.parse response.body
-      keys.find { |k| k["key"].strip == key.strip }
+      keys.find { |k| k['key'].strip == key.strip }
     end
   end
 end
+
+Chef::Resource.send(:include, DeployKeyCookbook::Helpers)
+Chef::Provider.send(:include, DeployKeyCookbook::Helpers)

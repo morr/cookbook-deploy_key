@@ -6,7 +6,7 @@ module DeployKeyCookbook
       end
 
       def add_token(request)
-        request.add_field "Authorization", "token #{new_resource.credentials[:token]}"
+        request.add_field 'Authorization', "token #{new_resource.credentials[:token]}"
         request
       end
 
@@ -15,7 +15,7 @@ module DeployKeyCookbook
       end
 
       def retrieved_key_id
-        "pk"
+        'pk'
       end
     end
   end
