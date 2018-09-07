@@ -8,20 +8,20 @@ This work is heavily based on the ideas and code of ZippyKid's [github-deploy-ke
 
 Use this cookbook as a dependency of whatever cookbook will manage your deploy keys.
 
-Declare a `deploy_key` resource and configure the provider:
+Declare a `deploy_key` resource and configure the provider (default service: github):
 
 ```ruby
 deploy_key "app_deploy_key" do
-  provider Chef::Provider::DeployKeyGithub
+  service 'github'
   ...
 end
 ```
 
 Supported providers:
 
-* `Chef::Provider::DeployKeyGithub`
-* `Chef::Provider::DeployKeyBitbucket`
-* `Chef::Provider::DeployKeyGitlab`
+* **gitlab**
+* **github**
+* **bitbucket**
 
 # Attributes
 
@@ -57,7 +57,7 @@ Authentication can be done either via username/password:
 
 ```ruby
 deploy_key "app_deploy_key" do
-  provider Chef::Provider::DeployKeyGithub
+  service 'github'
   credentials({
     :user => 'username@org.com',
     :password => 'very_secure_password'
@@ -66,11 +66,11 @@ deploy_key "app_deploy_key" do
 end
 ```
 
-or OAuth token ( [Github](http://developer.github.com/v3/oauth/) | [Bitbucket](https://confluence.atlassian.com/display/BITBUCKET/OAuth+on+Bitbucket) ):
+or OAuth token ( [Github](http://developer.github.com/v3/oauth/) | [Bitbucket](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html) ):
 
 ```ruby
 deploy_key "app_deploy_key" do
-  provider Chef::Provider::DeployKeyGithub
+  service 'github'
   credentials({
     :token => 'awesome_and_much_more_secure_token'
   })
@@ -82,7 +82,7 @@ end
 
 ```ruby
 deploy_key "bitbucket_key" do
-  provider Chef::Provider::DeployKeyBitbucket
+  service 'bitbucket'
   path '/home/app_user/.ssh'
   credentials({
     :token => 'my_bitbucket_oauth_token'
@@ -90,7 +90,7 @@ deploy_key "bitbucket_key" do
   repo 'organization/million_dollar_app'
   owner 'deploy'
   group 'deploy'
-  mode '0640'
+  mode '0600'
   action :add
 end
 ```
