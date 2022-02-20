@@ -1,4 +1,4 @@
-resource_name :deploy_key
+provides :deploy_key
 
 property :service, %w(gitlab github bitbucket), default: 'github'
 property :label, String, name_property: true
